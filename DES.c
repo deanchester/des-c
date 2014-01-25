@@ -61,8 +61,21 @@ CIPHER_TEXT encrypt(PLAIN_TEXT plain, KEY key){
 	CIPHER_LR cipher_right = (permuted & 0x00000000FFFFFFFF);
 	
 	for(i = 0; i<16; i++){
-		
+		CIPHER_LR returned = feistelFunction(cipher_right, i);
+		CIPHER_LR cipher_tmp = cipher_right;
+		cipher_right = cipher_left ^ returned;
+		cipher_left = cipher_tmp;
 	}
+	
+	permuted = (cipher_left << 32) + cipher_right; 
+	CIPHER_TEXT ciphered = 0; 
+	for(i = 1; i<65; i++){
+		CIPHER_TEXT tmpPermuted = ((65 - i) & permuted);
+		tmpPermuted << IIP[i];
+		ciphered += tmpPermuted;
+	}
+	
+	return ciphered;
 }
 
 CIPHER_LR feistelFunction(CIPHER_LR right, int round){
@@ -71,7 +84,7 @@ CIPHER_LR feistelFunction(CIPHER_LR right, int round){
 	for(i = 1; i<33; i++){
 		CIPHER_LR tmpExpanded = ((33 - i) & plain);
 		tmpExpanded << EXPANDED[i];
-		expanded += tmpPermuted;
+		expanded += tmpExpanded;
 	}
 	
 	expanded ^= keys[round];
@@ -94,12 +107,13 @@ CIPHER_LR feistelFunction(CIPHER_LR right, int round){
 	unsigned int s7 = S7[e7];
 	unsigned int s8 = S8[e8];
 	
-	CIPHER_LR returnVal = (s1<<32) + (s2 << 28) + (s3 << 24) + (s4 << 20) + (s5 << 16) + (s6 << 12) + (s7 << 8) + (s2 << 4);
-	
+	CIPHER_LR sBoxesRecombined = (s1<<28) + (s2 << 24) + (s3 << 20) + (s4 << 16) + (s5 << 12) + (s6 << 8) + (s7 << 4) + s2;
+	CIPHER_LR returnVal = 0;
 	for(i = 1; i<33; i++){
-		CIPHER_LR tmpExpanded = ((33 - i) & returnVal);
-		tmpExpanded << F_Permuted[i];
-		expanded += tmpPermuted;
+		CIPHER_LR tmpPermuted = ((33 - i) & sBoxesRecombined);
+		tmpPermuted << FEISTEL_PERMUTED[i];
+		returnVal += tmpPermuted;
 	}
 	
+	return returnVal;
 }
