@@ -8,7 +8,7 @@ inline KEY_LR shiftKey(KEY_LR key){
 
 void scheduleKeys(KEY key){
 	/*
-		Run 
+		Run the key scheduling algorithm 
 	*/
 	int i;
 	KEY keyPC1 = 0;
