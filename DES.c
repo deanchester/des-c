@@ -14,12 +14,12 @@ void scheduleKeys(KEY key){
 	KEY keyPC1 = 0;
 	
 	for(i = 1; i<65; i++){
-		KEY tmpKeyMasked = (64 - i) & i;
+		KEY tmpKeyMasked = ((64 - i) & key);
 		tmpKeyMasked << PC1[i];
 		keyPC1 += tmpKeyMasked;
 	}
 	
-	KEY_LR key_left = ((newKeyPC1 & 0xFFFFFFFF00000000) >> 0x20);
+	KEY_LR key_left = ((newKeyPC1 & 0xFFFFFFFF00000000) >> 32);
 	KEY_LR key_right = (newKeyPC1 & 0x00000000FFFFFFFF);
 
 	for(i = 0; i<16; i++){
@@ -32,10 +32,11 @@ void scheduleKeys(KEY key){
 		key_left = shiftKey(key_left);
 		key_right = shiftKey(key_right);
 		
-		KEY keyPC2 = 0; 
+		KEY keyReformed = key_left << 32 & key_right; 
+		KEY keyPC2 = 0;
 		
 		for(i = 1; i<65; i++){
-			KEY tmpKeyMasked = (64 - i) & i;
+			KEY tmpKeyMasked = ((64 - i) & keyReformed);
 			tmpKeyMasked << PC2[i];
 			keyPC2 += tmpKeyMasked;
 		}
