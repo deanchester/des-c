@@ -143,7 +143,7 @@ CIPHER_TEXT encrypt(PLAIN_TEXT plain, KEY key){
 	return ciphered;
 }
 
-CIPHER_TEXT decrypt(PLAIN_TEXT plain, KEY key){
+PLAIN_TEXT decrypt(CIPHER_TEXT plain, KEY key){
     KEY keys[16];
 	KEY *keysP;
 	keysP = &keys[0];
