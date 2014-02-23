@@ -143,6 +143,42 @@ CIPHER_TEXT encrypt(PLAIN_TEXT plain, KEY key){
 	return ciphered;
 }
 
+CIPHER_TEXT decrypt(PLAIN_TEXT plain, KEY key){
+    KEY keys[16];
+	KEY *keysP;
+	keysP = &keys[0];
+	scheduleKeys(key, keysP);
+	
+	int i;
+	CIPHER_TEXT permuted = 0; 
+	
+	for(i = 1; i<65; i++){
+		CIPHER_TEXT tmpPermuted = ((65 - i) & plain);
+		tmpPermuted << IP[i];
+		permuted += tmpPermuted;
+	}
+	
+	CIPHER_LR cipher_left = ((permuted & 0xFFFFFFFF00000000) >> 32);
+	CIPHER_LR cipher_right = (permuted & 0x00000000FFFFFFFF);
+	
+	for(i = 15; i>=; i--){
+		CIPHER_LR returned = feistelFunction(cipher_right, 	keysP[i]);
+		CIPHER_LR cipher_tmp = cipher_right;
+		cipher_right = cipher_left ^ returned;
+		cipher_left = cipher_tmp;
+	}
+	
+	permuted = (cipher_left << 32) + cipher_right; 
+	CIPHER_TEXT ciphered = 0; 
+	for(i = 1; i<65; i++){
+		CIPHER_TEXT tmpPermuted = ((65 - i) & permuted);
+		tmpPermuted << IIP[i];
+		ciphered += tmpPermuted;
+	}
+	
+	return ciphered;
+}
+
 CIPHER_LR feistelFunction(CIPHER_LR right, KEY subkey){
 	CIPHER_EXPANDED expanded = 0; 
 	int i; 
