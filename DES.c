@@ -96,22 +96,20 @@ void scheduleKeys(KEY key, KEY *keysP){
 		
 		KEY keyReformed = key_left << 32 & key_right; 
 		KEY keyPC2 = 0;
-		
+ 
 		for(i = 1; i<65; i++){
 			KEY tmpKeyMasked = ((65 - i) & keyReformed);
 			tmpKeyMasked << PC2[i];
 			keyPC2 += tmpKeyMasked;
 		}
-		
+
 		keysP[i] = keyPC2;
 	}
 }
 
 CIPHER_TEXT encrypt(PLAIN_TEXT plain, KEY key){
-    KEY keys[16];
-	KEY *keysP;
-	keysP = &keys[0];
-	scheduleKeys(key, keysP);
+	KEY *keys = malloc(16*sizeof(KEY));
+	scheduleKeys(key, keys);
 	
 	int i;
 	CIPHER_TEXT permuted = 0; 
@@ -126,7 +124,7 @@ CIPHER_TEXT encrypt(PLAIN_TEXT plain, KEY key){
 	CIPHER_LR cipher_right = (permuted & 0x00000000FFFFFFFF);
 	
 	for(i = 0; i<16; i++){
-		CIPHER_LR returned = feistelFunction(cipher_right, 	keysP[i]);
+		CIPHER_LR returned = feistelFunction(cipher_right, keys[i]);
 		CIPHER_LR cipher_tmp = cipher_right;
 		cipher_right = cipher_left ^ returned;
 		cipher_left = cipher_tmp;
@@ -140,14 +138,14 @@ CIPHER_TEXT encrypt(PLAIN_TEXT plain, KEY key){
 		ciphered += tmpPermuted;
 	}
 	
+	free(keys);
+	
 	return ciphered;
 }
 
 PLAIN_TEXT decrypt(CIPHER_TEXT plain, KEY key){
-    KEY keys[16];
-	KEY *keysP;
-	keysP = &keys[0];
-	scheduleKeys(key, keysP);
+	KEY *keys = malloc(16*sizeof(KEY));
+	scheduleKeys(key, keys);
 	
 	int i;
 	CIPHER_TEXT permuted = 0; 
@@ -162,7 +160,7 @@ PLAIN_TEXT decrypt(CIPHER_TEXT plain, KEY key){
 	CIPHER_LR cipher_right = (permuted & 0x00000000FFFFFFFF);
 	
 	for(i = 15; i>=0; i--){
-		CIPHER_LR returned = feistelFunction(cipher_right, 	keysP[i]);
+		CIPHER_LR returned = feistelFunction(cipher_right, keys[i]);
 		CIPHER_LR cipher_tmp = cipher_right;
 		cipher_right = cipher_left ^ returned;
 		cipher_left = cipher_tmp;
@@ -175,6 +173,8 @@ PLAIN_TEXT decrypt(CIPHER_TEXT plain, KEY key){
 		tmpPermuted << IIP[i];
 		ciphered += tmpPermuted;
 	}
+	
+	free(keys);
 	
 	return ciphered;
 }
