@@ -11,4 +11,6 @@ void scheduleKeys(KEY key, KEY *keysP);
 
 CIPHER_TEXT encrypt(PLAIN_TEXT plain, KEY key);
 
+CIPHER_TEXT decrypt(PLAIN_TEXT plain, KEY key);
+
 CIPHER_LR feistelFunction(CIPHER_LR right, KEY subkey);
