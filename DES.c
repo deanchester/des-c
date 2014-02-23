@@ -96,10 +96,10 @@ void scheduleKeys(KEY key, KEY *keysP){
 		
 		KEY keyReformed = key_left << 32 & key_right; 
 		KEY keyPC2 = 0;
- 
-		for(i = 1; i<65; i++){
-			KEY tmpKeyMasked = ((65 - i) & keyReformed);
-			tmpKeyMasked << PC2[i];
+		int j; 
+		for(j = 1; j<65; j++){
+			KEY tmpKeyMasked = ((65 - j) & keyReformed);
+			tmpKeyMasked << PC2[j];
 			keyPC2 += tmpKeyMasked;
 		}
 
