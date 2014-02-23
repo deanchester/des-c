@@ -161,7 +161,7 @@ PLAIN_TEXT decrypt(CIPHER_TEXT plain, KEY key){
 	CIPHER_LR cipher_left = ((permuted & 0xFFFFFFFF00000000) >> 32);
 	CIPHER_LR cipher_right = (permuted & 0x00000000FFFFFFFF);
 	
-	for(i = 15; i>=; i--){
+	for(i = 15; i>=0; i--){
 		CIPHER_LR returned = feistelFunction(cipher_right, 	keysP[i]);
 		CIPHER_LR cipher_tmp = cipher_right;
 		cipher_right = cipher_left ^ returned;
