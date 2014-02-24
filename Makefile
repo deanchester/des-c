@@ -1,5 +1,5 @@
 CC=gcc
-CFLAGS=-c -Wall
+CFLAGS=-c -Wall -g
 
 all: build
 
@@ -11,6 +11,11 @@ testDES.o: testDES.c
 
 des.o: des.c
 	$(CC) $(CFLAGS) DES.c -o DES.o
+	
+testKeyScheduling.o: testKeyScheduling.c
+	$(CC) $(CFLAGS) testKeyScheduling.c -o testKeyScheduling.o
 
+testkeys: des.o testKeyScheduling.c
+	gcc testKeyScheduling.c DES.o -o testKeyScheduling
 clean:
 	rm *.o
