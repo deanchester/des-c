@@ -101,9 +101,11 @@ void scheduleKeys(KEY key, KEY *keysP){
 
 		KEY keyPC2 = 0;
 		int j = 0; 
+		value = 1;
 		for(j = 0; j<64; j++){
-			KEY tmpKeyMasked = ((KEY)pow(2, i) & keyReformed);
+			KEY tmpKeyMasked = (value & keyReformed);
 			tmpKeyMasked <<= PC2[j];
+			value *= 2;
 			keyPC2 |= tmpKeyMasked;
 		}
 
@@ -117,15 +119,16 @@ CIPHER_TEXT encrypt(PLAIN_TEXT plain, KEY key){
 	
 	int i;
 	CIPHER_TEXT permuted = 0; 
-	
-	for(i = 1; i<65; i++){
-		CIPHER_TEXT tmpPermuted = ((65 - i) & plain);
+	KEY value = 1;
+	for(i = 0; i<64; i++){
+		CIPHER_TEXT tmpPermuted = (value & plain);
 		tmpPermuted << IP[i];
+		value *= 2;
 		permuted += tmpPermuted;
 	}
 	
-	CIPHER_LR cipher_left = ((permuted & 0xFFFFFFFF00000000) >> 32);
-	CIPHER_LR cipher_right = (permuted & 0x00000000FFFFFFFF);
+	CIPHER_LR cipher_left = ((permuted & (KEY)0xFFFFFFFF00000000) >> 32);
+	CIPHER_LR cipher_right = (permuted & (KEY)0x00000000FFFFFFFF);
 	
 	for(i = 0; i<16; i++){
 		CIPHER_LR returned = feistelFunction(cipher_right, keys[i]);
@@ -136,9 +139,11 @@ CIPHER_TEXT encrypt(PLAIN_TEXT plain, KEY key){
 	
 	permuted = (cipher_left << 32) + cipher_right; 
 	CIPHER_TEXT ciphered = 0; 
-	for(i = 1; i<65; i++){
-		CIPHER_TEXT tmpPermuted = ((65 - i) & permuted);
-		tmpPermuted << IIP[i-1];
+	value = 1;
+	for(i = 0; i<64; i++){
+		CIPHER_TEXT tmpPermuted = (value & permuted);
+		tmpPermuted <<= IIP[i];
+		value *= 2;
 		ciphered += tmpPermuted;
 	}
 	
@@ -154,9 +159,11 @@ PLAIN_TEXT decrypt(CIPHER_TEXT plain, KEY key){
 	int i;
 	CIPHER_TEXT permuted = 0; 
 	
-	for(i = 1; i<65; i++){
-		CIPHER_TEXT tmpPermuted = ((65 - i) & plain);
-		tmpPermuted << IP[i];
+	KEY value = 1;
+	for(i = 0; i<64; i++){
+		CIPHER_TEXT tmpPermuted = (value & plain);
+		tmpPermuted <<= IP[i];
+		value *= 2;
 		permuted += tmpPermuted;
 	}
 	
@@ -172,9 +179,11 @@ PLAIN_TEXT decrypt(CIPHER_TEXT plain, KEY key){
 	
 	permuted = (cipher_left << 32) + cipher_right; 
 	CIPHER_TEXT ciphered = 0; 
-	for(i = 1; i<65; i++){
-		CIPHER_TEXT tmpPermuted = ((65 - i) & permuted);
-		tmpPermuted << IIP[i];
+	value = 1;
+	for(i = 0; i<64; i++){
+		CIPHER_TEXT tmpPermuted = (value & permuted);
+		tmpPermuted <<= IIP[i];
+		value *= 2;
 		ciphered += tmpPermuted;
 	}
 	
@@ -212,11 +221,15 @@ CIPHER_LR feistelFunction(CIPHER_LR right, KEY subkey){
 	unsigned int s7 = S7[e7];
 	unsigned int s8 = S8[e8];
 	
-	CIPHER_LR sBoxesRecombined = (s1<<28) + (s2 << 24) + (s3 << 20) + (s4 << 16) + (s5 << 12) + (s6 << 8) + (s7 << 4) + s8;
+	CIPHER_LR sBoxesRecombined = (CIPHER_LR)(s1<<28) | (CIPHER_LR)(s2 << 24) | 
+		(CIPHER_LR)(s3 << 20) | (CIPHER_LR)(s4 << 16) | (CIPHER_LR)(s5 << 12) | 
+		(CIPHER_LR)(s6 << 8) | (CIPHER_LR) (s7 << 4) | (CIPHER_LR) (s8);
 	CIPHER_LR returnVal = 0;
-	for(i = 1; i<33; i++){
-		CIPHER_LR tmpPermuted = ((33 - i) & sBoxesRecombined);
-		tmpPermuted << FEISTEL_PERMUTED[i];
+	KEY_LR value = 1;
+	for(i = 0; i<32; i++){
+		CIPHER_LR tmpPermuted = (value & sBoxesRecombined);
+		tmpPermuted <<= FEISTEL_PERMUTED[i];
+		value *= 2;
 		returnVal += tmpPermuted;
 	}
 	
