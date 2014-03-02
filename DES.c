@@ -195,10 +195,12 @@ PLAIN_TEXT decrypt(CIPHER_TEXT plain, KEY key){
 CIPHER_LR feistelFunction(CIPHER_LR right, KEY subkey){
 	CIPHER_EXPANDED expanded = 0; 
 	int i; 
+	CIPHER_LR value1 = 1;
 	for(i = 1; i<33; i++){
-		CIPHER_LR tmpExpanded = ((33 - i) & right);
-		tmpExpanded << EXPANDED[i];
+		CIPHER_LR tmpExpanded = (value1 & right);
+		tmpExpanded <<= EXPANDED[i];
 		expanded += tmpExpanded;
+		value1 *= 2;
 	}
 	
 	expanded ^= subkey;
@@ -210,27 +212,29 @@ CIPHER_LR feistelFunction(CIPHER_LR right, KEY subkey){
 	unsigned char e4 = ((expanded & 0x3F60000000) >> 24);
 	unsigned char e3 = ((expanded & 0x3F6000000000) >> 30);
 	unsigned char e2 = ((expanded & 0x3F600000000000)  >> 36);
-	unsigned char e1 = ((expanded & 0x3F60000000000000) >> 42);
+	unsigned char e1 = ((expanded & 0x3F60000000000000) >> 42);	
 	
-	unsigned int s1 = S1[e1];
-	unsigned int s2 = S2[e2];
-	unsigned int s3 = S3[e3];
-	unsigned int s4 = S4[e4];
-	unsigned int s5 = S5[e5];
-	unsigned int s6 = S6[e6];
-	unsigned int s7 = S7[e7];
-	unsigned int s8 = S8[e8];
+	unsigned int s1 = S1[e8];
+	unsigned int s2 = S2[e7];
+	unsigned int s3 = S3[e6];
+	unsigned int s4 = S4[e5];
+	unsigned int s5 = S5[e4];
+	unsigned int s6 = S6[e3];
+	unsigned int s7 = S7[e2];
+	unsigned int s8 = S8[e1];
 	
 	CIPHER_LR sBoxesRecombined = (CIPHER_LR)(s1<<28) | (CIPHER_LR)(s2 << 24) | 
 		(CIPHER_LR)(s3 << 20) | (CIPHER_LR)(s4 << 16) | (CIPHER_LR)(s5 << 12) | 
 		(CIPHER_LR)(s6 << 8) | (CIPHER_LR) (s7 << 4) | (CIPHER_LR) (s8);
+	
 	CIPHER_LR returnVal = 0;
 	KEY_LR value = 1;
 	for(i = 0; i<32; i++){
 		CIPHER_LR tmpPermuted = (value & sBoxesRecombined);
-		tmpPermuted <<= FEISTEL_PERMUTED[i];
+		if(tmpPermuted == value){
+			returnVal += (CIPHER_LR)pow((double)2,FEISTEL_PERMUTED[i]-1);
+		}
 		value *= 2;
-		returnVal += tmpPermuted;
 	}
 	
 	return returnVal;
