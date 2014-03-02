@@ -15,6 +15,12 @@ des.o: des.c
 testKeyScheduling.o: testKeyScheduling.c
 	$(CC) $(CFLAGS) testKeyScheduling.c -o testKeyScheduling.o
 
+testFeistelFunction.c.o: testFeistelFunction.c.c
+	$(CC) $(CFLAGS) testFeistelFunction.c -o testFeistelFunction.o
+
+testFeistel: des.o testFeistelFunction.o
+	gcc testFeistelFunction.c DES.o -o testFeistel
+
 testkeys: des.o testKeyScheduling.c
 	gcc testKeyScheduling.c DES.o -o testKeyScheduling
 clean:
