@@ -5,9 +5,8 @@
 
 int main (int argc, char const *argv[])
 {
-	KEY key = 0x01;
+	KEY key = 0x133457799BBCDFF1;
 	
-	KEY_LR left = 0x01;
 	KEY *keys = malloc(16*sizeof(KEY));
 	scheduleKeys(key, keys);
 	int i;
