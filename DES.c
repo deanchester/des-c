@@ -78,9 +78,10 @@ void scheduleKeys(KEY key, KEY *keysP){
 	KEY value = 1;
 	for(i = 0; i<64; i++){
 		KEY tmpKeyMasked = (value & key);
-		tmpKeyMasked <<= PC1[i];
+		if(tmpKeyMasked == value){
+			keyPC1 += (1<<(PC1[i]-1));
+		}
 		value *= 2;
-		keyPC1 |= tmpKeyMasked;
 	}
 	KEY_LR key_left = 0;
 	KEY_LR key_right = 0;
@@ -104,9 +105,10 @@ void scheduleKeys(KEY key, KEY *keysP){
 		value = 1;
 		for(j = 0; j<64; j++){
 			KEY tmpKeyMasked = (value & keyReformed);
-			tmpKeyMasked <<= PC2[j];
+			if(tmpKeyMasked == value){
+				keyPC2 += (1<<(PC2[j]-1));
+			}
 			value *= 2;
-			keyPC2 |= tmpKeyMasked;
 		}
 
 		keysP[i] = keyPC2;
@@ -122,11 +124,12 @@ CIPHER_TEXT encrypt(PLAIN_TEXT plain, KEY key){
 	KEY value = 1;
 	for(i = 0; i<64; i++){
 		CIPHER_TEXT tmpPermuted = (value & plain);
-		tmpPermuted << IP[i];
+		if(tmpPermuted == value){
+			permuted += (1<<(IP[i]-1));
+		}
 		value *= 2;
-		permuted += tmpPermuted;
 	}
-	
+	printf("%x\n", permuted);
 	CIPHER_LR cipher_left = ((permuted & (KEY)0xFFFFFFFF00000000) >> 32);
 	CIPHER_LR cipher_right = (permuted & (KEY)0x00000000FFFFFFFF);
 	
@@ -232,7 +235,7 @@ CIPHER_LR feistelFunction(CIPHER_LR right, KEY subkey){
 	for(i = 0; i<32; i++){
 		CIPHER_LR tmpPermuted = (value & sBoxesRecombined);
 		if(tmpPermuted == value){
-			returnVal += (CIPHER_LR)pow((double)2,FEISTEL_PERMUTED[i]-1);
+			returnVal += (1<<(FEISTEL_PERMUTED[i]-1));
 		}
 		value *= 2;
 	}
