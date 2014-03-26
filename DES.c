@@ -1,17 +1,6 @@
 #include "DES.h"
 
-int PC2[] = {14,17,11,24,1,5,3,28,15,6,21,10,23,19,12,4,26,8,16,7,27,20,13,
-			2,41,52,31,37,47,55,30,40,51,45,33,48,44,49,39,56,34,53,46,42,
-			50,36,29,32};
-
-int PC1_LEFT[] = {57,49,41,33,25,17,9,1,58,50,42,34,26,18,10,2,59,51,43,35,27,19,
-			11,3,60,52,44,36};
-int PC1_RIGHT[] = {63,55,47,39,31,23,15,7,62,54,46,38,30,22,14,6,
-			61,53,45,37,29,21,13,5,28,20,12,4};
-			
-// int PC1[] = {57,49,41,33,25,17,9,1,58,50,42,34,26,18,10,2,59,51,43,35,27,19,
-// 			11,3,60,52,44,36, 63,55,47,39,31,23,15,7,62,54,46,38,30,22,14,6,
-// 			61,53,45,37,29,21,13,5,28,20,12,4};
+unsigned int PC2[] = {32, 29, 36, 50, 42, 46, 53, 34, 56, 39, 49, 44, 48, 33, 45, 51, 40, 30, 55, 47, 37, 31, 52, 41, 2, 13, 20, 27, 7, 16, 8, 26, 4, 12, 19, 23, 10, 21, 6, 15, 28, 3, 5, 1, 24, 11, 17, 14};
 
 unsigned int PC1[] = {4, 12, 20, 28, 5, 13, 21, 29, 37, 45, 53, 61, 6, 14, 22, 30, 38, 46, 54, 62, 7, 15, 23, 31, 39, 47, 55, 63, 36, 44, 52, 60, 3, 11, 19, 27, 35, 43, 51, 59, 2, 10, 18, 26, 34, 42, 50, 58, 1, 9, 17, 25, 33, 41, 49, 57};
 
@@ -105,7 +94,6 @@ void scheduleKeys(KEY key, KEY *keysP){
 	KEY keyPC1 = 0;
 		
 	KEY value = 1;
-	printBits(sizeof(keyPC1), &keyPC1);
 	
 	for(i = 0; i<56; i++){
 		value = (KEY)((KEY)1 << (KEY)(64-PC1[i]));
@@ -118,10 +106,6 @@ void scheduleKeys(KEY key, KEY *keysP){
 	
 	KEY_LR key_left = ((keyPC1 & 0xFFFFFFFFF0000000) >> 28);
 	KEY_LR key_right = (keyPC1 & 0x000000000FFFFFFF);
-	printBits(sizeof(key_left), &key_left);
-	
-	printBits(sizeof(key_right), &key_right);
-	value = 1;
 	for(i = 0; i<16; i++){
 		if(i == 2 || i == 3 || i == 4 || i == 5 || i == 6 || i == 7 || i == 9 || 
 			i == 10 || i == 11 || i == 12 || i == 13 || i == 14) {
@@ -132,19 +116,23 @@ void scheduleKeys(KEY key, KEY *keysP){
 		key_left = shiftKey(key_left);
 		key_right = shiftKey(key_right);
 
-		KEY keyReformed = (key_left << 32) | key_right; 
-
+		KEY newLeft = (KEY)((KEY)key_left << (KEY)28);
+		KEY keyReformed = (KEY)(newLeft | (KEY)key_right); 
+		printf("Key number: %d\n", i);
+		printBits(sizeof(keyReformed), &keyReformed);
 		KEY keyPC2 = 0;
 		int j = 0; 
-		value = 1;
-		for(j = 0; j<64; j++){
-			KEY tmpKeyMasked = (value & keyReformed);
-			if(tmpKeyMasked == value){
-				keyPC2 += (1<<(PC2[j]-1));
+		value = 0;
+		for(j = 0; j<56; j++){
+			value = (KEY)((KEY)1 << (KEY)(56-PC2[j]));
+			if(keyReformed & value){
+				KEY tmp = (KEY)1 << (KEY)j;
+				keyPC2 |= tmp;
 			}
-			value *= 2;
+			value = 0;
 		}
-
+		keyPC2 &= 0xFFFFFFFFFFFF;
+		printBits(sizeof(KEY), &keyPC2);
 		keysP[i] = keyPC2;
 	}
 }
