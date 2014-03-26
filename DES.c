@@ -1,12 +1,16 @@
 #include "DES.h"
 
-unsigned int PC2[] = {32, 29, 36, 50, 42, 46, 53, 34, 56, 39, 49, 44, 48, 33, 45, 51, 40, 30, 55, 47, 37, 31, 52, 41, 2, 13, 20, 27, 7, 16, 8, 26, 4, 12, 19, 23, 10, 21, 6, 15, 28, 3, 5, 1, 24, 11, 17, 14};
+unsigned int PC2[] = {32, 29, 36, 50, 42, 46, 53, 34, 56, 39, 49, 44, 48, 33, 
+					45, 51, 40, 30, 55, 47, 37, 31, 52, 41, 2, 13, 20, 27, 7, 
+					16, 8, 26, 4, 12, 19, 23, 10, 21, 6, 15, 28, 3, 5, 1, 24, 
+					11, 17, 14};
 
-unsigned int PC1[] = {4, 12, 20, 28, 5, 13, 21, 29, 37, 45, 53, 61, 6, 14, 22, 30, 38, 46, 54, 62, 7, 15, 23, 31, 39, 47, 55, 63, 36, 44, 52, 60, 3, 11, 19, 27, 35, 43, 51, 59, 2, 10, 18, 26, 34, 42, 50, 58, 1, 9, 17, 25, 33, 41, 49, 57};
+unsigned int PC1[] = {4, 12, 20, 28, 5, 13, 21, 29, 37, 45, 53, 61, 6, 14, 22, 
+					30, 38, 46, 54, 62, 7, 15, 23, 31, 39, 47, 55, 63, 36, 44, 
+					52, 60, 3, 11, 19, 27, 35, 43, 51, 59, 2, 10, 18, 26, 34, 
+					42, 50, 58, 1, 9, 17, 25, 33, 41, 49, 57};
 
-int IP[] = {58,50,42,34,26,18,10,2,60,52,44,36,28,20,12,4,62,54,46,38,30,22,14,
-			6,64,56,48,40,32,24,16,8,57,49,41,33,25,17,9,1,59,51,43,35,27,19,
-			11,3,61,53,45,37,29,21,13,5,63,55,47,39,31,23,15,7};
+int IP[] = {7, 15, 23, 31, 39, 47, 55, 63, 5, 13, 21, 29, 37, 45, 53, 61, 3, 11, 19, 27, 35, 43, 51, 59, 1, 9, 17, 25, 33, 41, 49, 57, 8, 16, 24, 32, 40, 48, 56, 64, 6, 14, 22, 30, 38, 46, 54, 62, 4, 12, 20, 28, 36, 44, 52, 60, 2, 10, 18, 26, 34, 42, 50, 58};
 			
 int EXPANDED[] = {32,1,2,3,4,5,4,5,6,7,8,9,8,9,10,11,12,13,12,13,14,15,16,17,
 				16,17,18,19,20,21,20,21,22,23,24,25,24,25,26,27,28,29,28,29,
@@ -118,8 +122,6 @@ void scheduleKeys(KEY key, KEY *keysP){
 
 		KEY newLeft = (KEY)((KEY)key_left << (KEY)28);
 		KEY keyReformed = (KEY)(newLeft | (KEY)key_right); 
-		printf("Key number: %d\n", i);
-		printBits(sizeof(keyReformed), &keyReformed);
 		KEY keyPC2 = 0;
 		int j = 0; 
 		value = 0;
@@ -132,7 +134,6 @@ void scheduleKeys(KEY key, KEY *keysP){
 			value = 0;
 		}
 		keyPC2 &= 0xFFFFFFFFFFFF;
-		printBits(sizeof(KEY), &keyPC2);
 		keysP[i] = keyPC2;
 	}
 }
@@ -140,21 +141,20 @@ void scheduleKeys(KEY key, KEY *keysP){
 CIPHER_TEXT encrypt(PLAIN_TEXT plain, KEY key){
 	KEY *keys = malloc(16*sizeof(KEY));
 	scheduleKeys(key, keys);
-	
 	int i;
 	CIPHER_TEXT permuted = 0; 
-	KEY value = 1;
+	CIPHER_TEXT value = 1;
 	for(i = 0; i<64; i++){
-		CIPHER_TEXT tmpPermuted = (value & plain);
-		if(tmpPermuted == value){
-			permuted += (1<<(IP[i]-1));
+		CIPHER_TEXT tmpPermuted = (CIPHER_TEXT)((CIPHER_TEXT)1 << (CIPHER_TEXT)(64-IP[i]));
+		if(tmpPermuted & plain){
+			CIPHER_TEXT cTMP = (CIPHER_TEXT)1<<(CIPHER_TEXT)i;
+			permuted |= cTMP;
 		}
-		value *= 2;
 	}
-	printf("%x\n", permuted);
 	CIPHER_LR cipher_left = ((permuted & (KEY)0xFFFFFFFF00000000) >> 32);
 	CIPHER_LR cipher_right = (permuted & (KEY)0x00000000FFFFFFFF);
-	
+	printBits(sizeof(cipher_right), &cipher_left);
+	printBits(sizeof(cipher_right), &cipher_right);
 	for(i = 0; i<16; i++){
 		CIPHER_LR returned = feistelFunction(cipher_right, keys[i]);
 		CIPHER_LR cipher_tmp = cipher_right;
