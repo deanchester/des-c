@@ -72,7 +72,11 @@ int IIP[] = {40,8,48,16,56,24,64,32,39,7,47,15,55,23,63,31,38,6,46,14,54,22,
 			19,59,27,34,2,42,10,50,18,58,26,33,1,41,9,49,17,57,25};
 
 KEY_LR shiftKey(KEY_LR key){
-	return (key << (unsigned int)1) | (key >> (sizeof(key) * (unsigned int) 8 - (unsigned int) 1));
+	KEY_LR lsbs = key & 0x7FFFFFF;
+	lsbs <<= 1;
+	KEY_LR MSB = key & 0x8000000;
+	MSB >>= 27;
+	return lsbs | MSB;
 }
 
 void printBits(size_t const size, void const * const ptr)
@@ -112,9 +116,11 @@ void scheduleKeys(KEY key, KEY *keysP){
 		value = 0;
 	}
 	
-	KEY_LR key_left = ((keyPC1 & 0xFFFFFFFF00000000) >> 32);
-	KEY_LR key_right = (keyPC1 & 0x00000000FFFFFFFF);
-
+	KEY_LR key_left = ((keyPC1 & 0xFFFFFFFFF0000000) >> 28);
+	KEY_LR key_right = (keyPC1 & 0x000000000FFFFFFF);
+	printBits(sizeof(key_left), &key_left);
+	
+	printBits(sizeof(key_right), &key_right);
 	value = 1;
 	for(i = 0; i<16; i++){
 		if(i == 2 || i == 3 || i == 4 || i == 5 || i == 6 || i == 7 || i == 9 || 
