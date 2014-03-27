@@ -12,9 +12,7 @@ unsigned int PC1[] = {4, 12, 20, 28, 5, 13, 21, 29, 37, 45, 53, 61, 6, 14, 22,
 
 int IP[] = {7, 15, 23, 31, 39, 47, 55, 63, 5, 13, 21, 29, 37, 45, 53, 61, 3, 11, 19, 27, 35, 43, 51, 59, 1, 9, 17, 25, 33, 41, 49, 57, 8, 16, 24, 32, 40, 48, 56, 64, 6, 14, 22, 30, 38, 46, 54, 62, 4, 12, 20, 28, 36, 44, 52, 60, 2, 10, 18, 26, 34, 42, 50, 58};
 			
-int EXPANDED[] = {32,1,2,3,4,5,4,5,6,7,8,9,8,9,10,11,12,13,12,13,14,15,16,17,
-				16,17,18,19,20,21,20,21,22,23,24,25,24,25,26,27,28,29,28,29,
-				30,31,32,1};
+int EXPANDED[] = {1, 32, 31, 30, 29, 28, 29, 28, 27, 26, 25, 24, 25, 24, 23, 22, 21, 20, 21, 20, 19, 18, 17, 16, 17, 16, 15, 14, 13, 12, 13, 12, 11, 10, 9, 8, 9, 8, 7, 6, 5, 4, 5, 4, 3, 2, 1, 32};
 
 unsigned int S1[] = {14,0,4,15,13,7,1,4,2,14, 15, 2, 11, 13, 8, 1, 3, 10, 10,
 		 			6, 6, 12, 12, 11, 5, 9, 9, 5, 0, 3, 7, 8, 4, 15, 1, 12, 
@@ -153,8 +151,7 @@ CIPHER_TEXT encrypt(PLAIN_TEXT plain, KEY key){
 	}
 	CIPHER_LR cipher_left = ((permuted & (KEY)0xFFFFFFFF00000000) >> 32);
 	CIPHER_LR cipher_right = (permuted & (KEY)0x00000000FFFFFFFF);
-	printBits(sizeof(cipher_right), &cipher_left);
-	printBits(sizeof(cipher_right), &cipher_right);
+
 	for(i = 0; i<16; i++){
 		CIPHER_LR returned = feistelFunction(cipher_right, keys[i]);
 		CIPHER_LR cipher_tmp = cipher_right;
@@ -220,12 +217,12 @@ PLAIN_TEXT decrypt(CIPHER_TEXT plain, KEY key){
 CIPHER_LR feistelFunction(CIPHER_LR right, KEY subkey){
 	CIPHER_EXPANDED expanded = 0; 
 	int i; 
-	CIPHER_LR value1 = 1;
-	for(i = 1; i<33; i++){
-		CIPHER_LR tmpExpanded = (value1 & right);
-		tmpExpanded <<= EXPANDED[i];
-		expanded += tmpExpanded;
-		value1 *= 2;
+
+	for(i = 0; i<48; i++){
+		CIPHER_EXPANDED value = (CIPHER_EXPANDED)((CIPHER_EXPANDED)1 << (CIPHER_EXPANDED)(32-EXPANDED[i]));
+		if(value & right){
+			expanded |= (CIPHER_EXPANDED)1 << (CIPHER_EXPANDED)i;
+		}
 	}
 	
 	expanded ^= subkey;
@@ -239,18 +236,20 @@ CIPHER_LR feistelFunction(CIPHER_LR right, KEY subkey){
 	unsigned char e2 = ((expanded & 0x3F600000000000)  >> 36);
 	unsigned char e1 = ((expanded & 0x3F60000000000000) >> 42);	
 	
-	unsigned int s1 = S1[e8];
-	unsigned int s2 = S2[e7];
-	unsigned int s3 = S3[e6];
-	unsigned int s4 = S4[e5];
-	unsigned int s5 = S5[e4];
-	unsigned int s6 = S6[e3];
-	unsigned int s7 = S7[e2];
-	unsigned int s8 = S8[e1];
+	unsigned int s1 = S1[e1];
+	unsigned int s2 = S2[e2];
+	unsigned int s3 = S3[e3];
+	unsigned int s4 = S4[e4];
+	unsigned int s5 = S5[e5];
+	unsigned int s6 = S6[e6];
+	unsigned int s7 = S7[e7];
+	unsigned int s8 = S8[e8];
 	
 	CIPHER_LR sBoxesRecombined = (CIPHER_LR)(s1<<28) | (CIPHER_LR)(s2 << 24) | 
 		(CIPHER_LR)(s3 << 20) | (CIPHER_LR)(s4 << 16) | (CIPHER_LR)(s5 << 12) | 
 		(CIPHER_LR)(s6 << 8) | (CIPHER_LR) (s7 << 4) | (CIPHER_LR) (s8);
+	
+	printBits(sizeof(sBoxesRecombined), &sBoxesRecombined);
 	
 	CIPHER_LR returnVal = 0;
 	KEY_LR value = 1;
