@@ -3,11 +3,11 @@
 #include <stdlib.h>
 
 int main (int argc, char const *argv[]) {
-	KEY key = 0;
-	CIPHER_LR text = 0;
+	KEY key = 0x1B02EFFC7072;
+	CIPHER_LR text = 0xF0AAF0AA;
 	
 	CIPHER_LR returned = feistelFunction(text, key);
 	
-	printf("%x\n", returned);
+	printBits(sizeof(returned), &returned);
 	
 }
