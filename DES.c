@@ -227,15 +227,24 @@ CIPHER_LR feistelFunction(CIPHER_LR right, KEY subkey){
 	
 	expanded ^= subkey;
 	
-	unsigned char e8 = ((expanded & 0x3F));
-	unsigned char e7 = ((expanded & 0x3F60) >> 6);
-	unsigned char e6 = ((expanded & 0x3F6000) >> 12);
-	unsigned char e5 = ((expanded & 0x3F600000) >> 18);
-	unsigned char e4 = ((expanded & 0x3F60000000) >> 24);
-	unsigned char e3 = ((expanded & 0x3F6000000000) >> 30);
-	unsigned char e2 = ((expanded & 0x3F600000000000)  >> 36);
-	unsigned char e1 = ((expanded & 0x3F60000000000000) >> 42);	
+	printBits(sizeof(expanded), &expanded);
 	
+	unsigned char e8 = ((expanded & 0x3F)) & 0x3F;
+	unsigned char e7 = ((expanded & 0x3F60) >> 6) & 0x3F;
+	unsigned char e6 = ((expanded & 0x3F6000) >> 12) & 0x3F;
+	unsigned char e5 = ((expanded & 0x3F600000) >> 18) & 0x3F;
+	unsigned char e4 = ((expanded & 0x3F60000000) >> 24) & 0x3F;
+	unsigned char e3 = ((expanded & 0x3F6000000000) >> 30) & 0x3F;
+	unsigned char e2 = ((expanded & 0x3F600000000000)  >> 36) & 0x3F;
+	unsigned char e1 = ((expanded & 0x3F60000000000000) >> 42) & 0x3F;	
+	printBits(sizeof(e1), &e1);
+	printBits(sizeof(e1), &e2);
+	printBits(sizeof(e1), &e3);
+	printBits(sizeof(e1), &e4);
+	printBits(sizeof(e1), &e5);
+	printBits(sizeof(e1), &e6);
+	printBits(sizeof(e1), &e7);
+	printBits(sizeof(e1), &e8);
 	unsigned int s1 = S1[e1];
 	unsigned int s2 = S2[e2];
 	unsigned int s3 = S3[e3];
@@ -254,11 +263,10 @@ CIPHER_LR feistelFunction(CIPHER_LR right, KEY subkey){
 	CIPHER_LR returnVal = 0;
 	KEY_LR value = 1;
 	for(i = 0; i<32; i++){
-		CIPHER_LR tmpPermuted = (value & sBoxesRecombined);
-		if(tmpPermuted == value){
-			returnVal += (1<<(FEISTEL_PERMUTED[i]-1));
+		CIPHER_LR tmpPermuted = (CIPHER_LR)((CIPHER_LR)1 << (CIPHER_LR)(32-FEISTEL_PERMUTED[i]));;
+		if(tmpPermuted & sBoxesRecombined){
+			returnVal |= ((CIPHER_LR)1<< (CIPHER_LR)i);
 		}
-		value *= 2;
 	}
 	
 	return returnVal;
