@@ -14,45 +14,45 @@ int IP[] = {7, 15, 23, 31, 39, 47, 55, 63, 5, 13, 21, 29, 37, 45, 53, 61, 3, 11,
 			
 int EXPANDED[] = {1, 32, 31, 30, 29, 28, 29, 28, 27, 26, 25, 24, 25, 24, 23, 22, 21, 20, 21, 20, 19, 18, 17, 16, 17, 16, 15, 14, 13, 12, 13, 12, 11, 10, 9, 8, 9, 8, 7, 6, 5, 4, 5, 4, 3, 2, 1, 32};
 
-unsigned int S1[] = {14,  4, 13,  1,  2, 15, 11,  8,  3, 10,  6, 12,  5,  9,  0,  7,
-		 			 0, 15,  7,  4, 14,  2, 13,  1, 10,  6, 12, 11,  9,  5,  3,  8,
-		 			 4,  1, 14,  8, 13,  6,  2, 11, 15, 12,  9,  7,  3, 10,  5,  0,
-		 			15, 12,  8,  2,  4,  9,  1,  7,  5, 11,  3, 14, 10,  0,  6, 13};
+unsigned int S1[] = {14,0,4,15,13,7,1,4,2,14, 15, 2, 11, 13, 8, 1, 3, 10, 10,
+		 			6, 6, 12, 12, 11, 5, 9, 9, 5, 0, 3, 7, 8, 4, 15, 1, 12, 
+					14, 8, 8, 2, 13, 4, 6, 9, 2, 1, 11, 7, 15, 5, 12, 11, 9, 
+					3, 7, 14, 3, 10, 10, 0, 5, 6, 0, 13};
 
 unsigned int S2[] = {15,  1,  8, 14,  6, 11,  3,  4,  9,  7,  2, 13, 12,  0,  5, 10,
-		 			 3, 13,  4,  7, 15,  2,  8, 14, 12,  0,  1, 10,  6,  9, 11,  5,
-		 			 0, 14,  7, 11, 10,  4, 13,  1,  5,  8, 12,  6,  9,  3,  2, 15,
-		 			13,  8, 10,  1,  3, 15,  4,  2, 11,  6,  7, 12,  0,  5, 14,  9};
+			 3, 13,  4,  7, 15,  2,  8, 14, 12,  0,  1, 10,  6,  9, 11,  5,
+			 0, 14,  7, 11, 10,  4, 13,  1,  5,  8, 12,  6,  9,  3,  2, 15,
+			13,  8, 10,  1,  3, 15,  4,  2, 11,  6,  7, 12,  0,  5, 14,  9};
 
-unsigned int S3[] = {10,  0,  9, 14,  6,  3, 15,  5,  1, 13, 12,  7, 11,  4,  2,  8,
-		 			13,  7,  0,  9,  3,  4,  6, 10,  2,  8,  5, 14, 12, 11, 15,  1,
-		 			13,  6,  4,  9,  8, 15,  3,  0, 11,  1,  2, 12,  5, 10, 14,  7,
-		 			 1, 10, 13,  0,  6,  9,  8,  7,  4, 15, 14,  3, 11,  5,  2, 12};
+unsigned int S3[] = {10, 13, 0, 7, 9, 0, 14, 9, 6, 3, 3, 4, 15, 6, 5, 10, 1, 2,
+		 			13, 8, 12, 5, 7, 14, 11, 12, 4, 11, 2, 15, 8, 1, 13, 1, 6,
+					10, 4, 13, 9, 0, 8, 6, 15, 9, 3, 8, 0, 7, 11, 4, 1, 15, 2, 
+					14, 12, 3, 4, 11, 10, 5, 14, 2, 7, 12};
 
-unsigned int S4[] = { 7, 13, 14,  3,  0,  6,  9, 10,  1,  2,  8,  5, 11, 12,  4, 15,
-		 			13,  8, 11,  5,  6, 15,  0,  3,  4,  7,  2, 12,  1, 10, 14,  9,
-		 			10,  6,  9,  0, 12, 11,  7, 13, 15,  1,  3, 14,  5,  2,  8,  4,
-		 			 3, 15,  0,  6, 10,  1, 13,  8,  9,  4,  5, 11, 12,  7,  2, 14};
+unsigned int S4[] = {7, 13, 13, 8, 14, 11, 3, 5, 0, 6, 6, 15, 9, 0, 10, 3, 1, 
+					4, 2, 7, 8, 2, 5, 12, 11, 1, 12, 10, 4, 14, 15, 9, 10, 3,
+					6, 15, 9, 0, 0, 6, 12, 10, 11, 1, 7, 13, 13, 8, 15, 9, 1, 
+					4, 3, 5, 14, 11, 5, 12, 2, 7, 8, 2, 3, 14};
 
 unsigned int S5[] = { 2, 12,  4,  1,  7, 10, 11,  6,  8,  5,  3, 15, 13,  0, 14,  9,
-		 			14, 11,  2, 12,  4,  7, 13,  1,  5,  0, 15, 10,  3,  9,  8,  6,
-		 			 4,  2,  1, 11, 10, 13,  7,  8, 15,  9, 12,  5,  6,  3,  0, 14,
-		 			11,  8, 12,  7,  1, 14,  2, 13,  6, 15,  0,  9, 10,  4,  5,  3};
+			14, 11,  2, 12,  4,  7, 13,  1,  5,  0, 15, 10,  3,  9,  8,  6,
+			 4,  2,  1, 11, 10, 13,  7,  8, 15,  9, 12,  5,  6,  3,  0, 14,
+			11,  8, 12,  7,  1, 14,  2, 13,  6, 15,  0,  9, 10,  4,  5,  3};
 
-unsigned int S6[] = {12,  1, 10, 15,  9,  2,  6,  8,  0, 13,  3,  4, 14,  7,  5, 11,
-		 			10, 15,  4,  2,  7, 12,  9,  5,  6,  1, 13, 14,  0, 11,  3,  8,
-		 			 9, 14, 15,  5,  2,  8, 12,  3,  7,  0,  4, 10,  1, 13, 11,  6,
-		 			 4,  3,  2, 12,  9,  5, 15, 10, 11, 14,  1,  7,  6,  0,  8, 13};
+unsigned int S6[] = {12, 10, 1, 15, 10, 4, 15, 2, 9, 7, 2, 12, 6, 9, 8, 5, 0,
+					6, 13, 1, 3, 13, 4, 14, 14, 0, 7, 11, 5, 3, 11, 8, 9, 4, 
+					14, 3, 15, 2, 5, 12, 2, 9, 8, 5, 12, 15, 3, 10, 7, 11, 0,
+					14, 4, 1, 10, 7, 1, 6, 13, 0, 11, 8, 6, 13};
 
-unsigned int S7[] = { 4, 11,  2, 14, 15,  0,  8, 13,  3, 12,  9,  7,  5, 10,  6,  1,
-		 			13,  0, 11,  7,  4,  9,  1, 10, 14,  3,  5, 12,  2, 15,  8,  6,
-		 			 1,  4, 11, 13, 12,  3,  7, 14, 10, 15,  6,  8,  0,  5,  9,  2,
-		 			 6, 11, 13,  8,  1,  4, 10,  7,  9,  5,  0, 15, 14,  2,  3, 12};
+unsigned int S7[] = {4, 13, 11, 0, 2, 11, 14, 7, 15, 4, 0, 9, 8, 1, 13, 10, 3,
+					14, 12, 3, 9, 5, 7, 12, 5, 2, 10, 15, 6, 8, 1, 6, 1, 6, 4,
+					11, 11, 13, 13, 8, 12, 1, 3, 4, 7, 10, 14, 7, 10, 9, 15,
+					5, 6, 0, 8, 15, 0, 14, 5, 2, 9, 3, 2, 12};
 
 unsigned int S8[] = {13,  2,  8,  4,  6, 15, 11,  1, 10,  9,  3, 14,  5,  0, 12,  7,
-		 			 1, 15, 13,  8, 10,  3,  7,  4, 12,  5,  6, 11,  0, 14,  9,  2,
-		 			 7, 11,  4,  1,  9, 12, 14,  2,  0,  6, 10, 13, 15,  3,  5,  8,
-		 			 2,  1, 14,  7,  4, 10,  8, 13, 15, 12,  9,  0,  3,  5,  6, 11};
+			 1, 15, 13,  8, 10,  3,  7,  4, 12,  5,  6, 11,  0, 14,  9,  2,
+			 7, 11,  4,  1,  9, 12, 14,  2,  0,  6, 10, 13, 15,  3,  5,  8,
+			 2,  1, 14,  7,  4, 10,  8, 13, 15, 12,  9,  0,  3,  5,  6, 11};
 
 int FEISTEL_PERMUTED[] = {16, 7, 20, 21, 29, 12, 28, 17, 1, 15, 23, 26, 5, 18,
 						31, 10, 2, 8, 24, 14, 32, 27, 3, 9, 19, 13, 30, 6, 22,
@@ -236,29 +236,38 @@ CIPHER_LR feistelFunction(CIPHER_LR right, KEY subkey){
 	unsigned char e2 = ((expanded & 0x3F000000000)  >> 36) & 0x3F;
 	unsigned char e1 = ((expanded & 0xFC0000000000) >> 42) & 0x3F;	
 
-	unsigned char s1Col = e1 & 0x1E;
-	unsigned char s1Row = (unsigned char) 16 * ((e1 & 0x20) >>4 | (e1 & 0x01));
+	unsigned char s1Col = (e1 & (unsigned char)0x1E)>> (unsigned char)1;
+	unsigned char s1Row = (e1 & (unsigned char)0x20) >> (unsigned char)4| (e1 & (unsigned char)0x01);
+	s1Row *= 16;
 	
-	unsigned char s2Col = e2 & 0x1E;
-	unsigned char s2Row = (unsigned char) 16 * ((e2 & 0x20) >>4 | (e2 & 0x01));
+	unsigned char s2Col = (e2 & (unsigned char)0x1E)>> (unsigned char)1;
+	unsigned char s2Row = ((e2 & (unsigned char)0x20) >> (unsigned char)5 | (e2 & (unsigned char)0x01));
+	s2Row *= 16;
+	printBits(sizeof(s2Col), &s2Col);
+	printBits(sizeof(s2Row), &s2Row);
+	unsigned char s3Col = (e3 & (unsigned char)0x1E)>> (unsigned char)1;
+	unsigned char s3Row = ((e3 & (unsigned char)0x20) >> (unsigned char)4 | (e3 & (unsigned char)0x01));
+	s3Row *= 16;
 	
-	unsigned char s3Col = e3 & 0x1E;
-	unsigned char s3Row = (unsigned char) 16 * ((e3 & 0x20) >>4 | (e3 & 0x01));
-	
-	unsigned char s4Col = e4 & 0x1E;
-	unsigned char s4Row = (unsigned char) 16 * ((e4 & 0x20) >>4 | (e4 & 0x01));
-	
-	unsigned char s5Col = e5 & 0x1E;
-	unsigned char s5Row = (unsigned char) 16 * ((e5 & 0x20) >>4 | (e5 & 0x01));
-	
-	unsigned char s6Col = e6 & 0x1E;
-	unsigned char s6Row = (unsigned char) 16 * ((e6 & 0x20) >>4 | (e6 & 0x01));
-	
-	unsigned char s7Col = e7 & 0x1E;
-	unsigned char s7Row = (unsigned char) 16 * ((e7 & 0x20) >>4 | (e7 & 0x01));
-	
-	unsigned char s8Col = e8 & 0x1E;
-	unsigned char s8Row = (unsigned char) 16 * ((e8 & 0x20) >>4 | (e8 & 0x01));
+	unsigned char s4Col = (e4 & (unsigned char)0x1E)>> (unsigned char)1;
+	unsigned char s4Row = ((e4 & (unsigned char)0x20) >> (unsigned char)5 | (e4 & (unsigned char)0x01));
+	s4Row *= 16;
+	                                                          
+	unsigned char s5Col = (e5 & (unsigned char)0x1E)>> (unsigned char)1;                          
+	unsigned char s5Row = ((e5 & (unsigned char)0x20) >> (unsigned char)4 | (e5 & (unsigned char)0x01));
+	s5Row *= 16;
+	                                                          
+	unsigned char s6Col = (e6 & (unsigned char)0x1E)>> (unsigned char)1;                          
+	unsigned char s6Row = ((e6 & (unsigned char)0x20) >> (unsigned char)5 | (e6 & 0x01));
+	s6Row *= 16;
+	                                                          
+	unsigned char s7Col = (e7 & (unsigned char)0x1E)>> (unsigned char)1;                          
+	unsigned char s7Row = ((e7 & (unsigned char)0x20) >> (unsigned char)4 | (e7 & 0x01));
+	s7Row *= 16;
+	                                                           
+	unsigned char s8Col = (e8 & (unsigned char)0x1E)>> (unsigned char)1;                           
+	unsigned char s8Row = ((e8 & (unsigned char)0x20) >>(unsigned char)5 | (e8 & 0x01));
+	s8Row *= 16;
 	
 	unsigned int s1 = S1[(s1Col + s1Row)];
 	unsigned int s2 = S2[(s2Col + s2Row)];
@@ -268,15 +277,6 @@ CIPHER_LR feistelFunction(CIPHER_LR right, KEY subkey){
 	unsigned int s6 = S6[(s6Col + s6Row)];
 	unsigned int s7 = S7[(s7Col + s7Row)];
 	unsigned int s8 = S8[(s8Col + s8Row)];
-	
-	printBits(sizeof(s1), &s1);
-	printBits(sizeof(s1), &s2);
-	printBits(sizeof(s1), &s3);
-	printBits(sizeof(s1), &s4);
-	printBits(sizeof(s1), &s5);
-	printBits(sizeof(s1), &s6);
-	printBits(sizeof(s1), &s7);
-	printBits(sizeof(s1), &s8);
 	
 	CIPHER_LR sBoxesRecombined = (CIPHER_LR)(s1<<28) | (CIPHER_LR)(s2 << 24) | 
 		(CIPHER_LR)(s3 << 20) | (CIPHER_LR)(s4 << 16) | (CIPHER_LR)(s5 << 12) | 
