@@ -56,9 +56,7 @@ int S8[] = {13,  2,  8,  4,  6, 15, 11,  1, 10,  9,  3, 14,  5,  0, 12,  7,
 
 int FEISTEL_PERMUTED[] = {25, 4, 11, 22, 6, 30, 13, 19, 9, 3, 27, 32, 14, 24, 8, 2, 10, 31, 18, 5, 26, 23, 15, 1, 17, 28, 12, 29, 21, 20, 7, 16};
 
-int IIP[] = {40,8,48,16,56,24,64,32,39,7,47,15,55,23,63,31,38,6,46,14,54,22,
-			62,30,37,5,45,13,53,21,61,29,36,4,44,12,52,20,60,28,35,3,43,11,51,
-			19,59,27,34,2,42,10,50,18,58,26,33,1,41,9,49,17,57,25};
+int IIP[] = {25, 57, 17, 49, 9, 41, 1, 33, 26, 58, 18, 50, 10, 42, 2, 34, 27, 59, 19, 51, 11, 43, 3, 35, 28, 60, 20, 52, 12, 44, 4, 36, 29, 61, 21, 53, 13, 45, 5, 37, 30, 62, 22, 54, 14, 46, 6, 38, 31, 63, 23, 55, 15, 47, 7, 39, 32, 64, 24, 56, 16, 48, 8, 40};
 
 KEY_LR shiftKey(KEY_LR key){
 	KEY_LR lsbs = key & 0x7FFFFFF;
@@ -151,60 +149,24 @@ CIPHER_TEXT encrypt(PLAIN_TEXT plain, KEY key){
 	CIPHER_LR cipher_right = (permuted & (KEY)0x00000000FFFFFFFF);
 
 	for(i = 0; i<16; i++){
-		CIPHER_LR returned = feistelFunction(cipher_right, keys[i]);
+		printf("R%d=%llx\n", i, cipher_right);
+		
+		CIPHER_LR returned = feistelFunction(cipher_right, (keys[i] & (KEY)0xffffffffffff));
+		
 		CIPHER_LR cipher_tmp = cipher_right;
 		cipher_right = cipher_left ^ returned;
 		cipher_left = cipher_tmp;
 	}
 	
-	permuted = (cipher_left << 32) + cipher_right; 
+	permuted = (cipher_right << 32) | cipher_left; 
 	CIPHER_TEXT ciphered = 0; 
-	value = 1;
+	
 	for(i = 0; i<64; i++){
-		CIPHER_TEXT tmpPermuted = (value & permuted);
-		tmpPermuted <<= IIP[i];
-		value *= 2;
-		ciphered += tmpPermuted;
-	}
-	
-	free(keys);
-	
-	return ciphered;
-}
-
-PLAIN_TEXT decrypt(CIPHER_TEXT plain, KEY key){
-	KEY *keys = malloc(16*sizeof(KEY));
-	scheduleKeys(key, keys);
-	
-	int i;
-	CIPHER_TEXT permuted = 0; 
-	
-	KEY value = 1;
-	for(i = 0; i<64; i++){
-		CIPHER_TEXT tmpPermuted = (value & plain);
-		tmpPermuted <<= IP[i];
-		value *= 2;
-		permuted += tmpPermuted;
-	}
-	
-	CIPHER_LR cipher_left = ((permuted & 0xFFFFFFFF00000000) >> 32);
-	CIPHER_LR cipher_right = (permuted & 0x00000000FFFFFFFF);
-	
-	for(i = 15; i>=0; i--){
-		CIPHER_LR returned = feistelFunction(cipher_right, keys[i]);
-		CIPHER_LR cipher_tmp = cipher_right;
-		cipher_right = cipher_left ^ returned;
-		cipher_left = cipher_tmp;
-	}
-	
-	permuted = (cipher_left << 32) + cipher_right; 
-	CIPHER_TEXT ciphered = 0; 
-	value = 1;
-	for(i = 0; i<64; i++){
-		CIPHER_TEXT tmpPermuted = (value & permuted);
-		tmpPermuted <<= IIP[i];
-		value *= 2;
-		ciphered += tmpPermuted;
+		CIPHER_TEXT tmpPermuted = (CIPHER_TEXT)((CIPHER_TEXT)1 << (CIPHER_TEXT)(64-IIP[i]));
+		if(tmpPermuted & permuted){
+			CIPHER_TEXT cTMP = (CIPHER_TEXT)1<<(CIPHER_TEXT)i;
+			ciphered |= cTMP;
+		}
 	}
 	
 	free(keys);
@@ -241,8 +203,7 @@ CIPHER_LR feistelFunction(CIPHER_LR right, KEY subkey){
 	unsigned char s2Col = (e2 & (unsigned char)0x1E)>> (unsigned char)1;
 	unsigned char s2Row = ((e2 & (unsigned char)0x20) >> (unsigned char)5 | (e2 & (unsigned char)0x01));
 	s2Row *= 16;
-	printBits(sizeof(s2Col), &s2Col);
-	printBits(sizeof(s2Row), &s2Row);
+	
 	unsigned char s3Col = (e3 & (unsigned char)0x1E)>> (unsigned char)1;
 	unsigned char s3Row = ((e3 & (unsigned char)0x20) >> (unsigned char)4 | (e3 & (unsigned char)0x01));
 	s3Row *= 16;
@@ -267,15 +228,6 @@ CIPHER_LR feistelFunction(CIPHER_LR right, KEY subkey){
 	unsigned char s8Row = ((e8 & (unsigned char)0x20) >>(unsigned char)4 | (e8 & 0x01));
 	s8Row *= 16;
 	
-	printf("1: %d\n", (s1Col + s1Row));
-	printf("2: %d\n", (s2Col + s2Row));	
-	printf("3: %d\n", (s3Col + s3Row));
-	printf("4: %d\n", (s4Col + s4Row));
-	printf("5: %d\n", (s5Col + s5Row));
-	printf("6: %d\n", (s6Col + s6Row));	
-	printf("7: %d\n", (s7Col + s7Row));
-	printf("8: %d\n", (s8Col + s8Row));
-	
 	unsigned int s1 = S1[(s1Col + s1Row)];
 	unsigned int s2 = S2[(s2Col + s2Row)];
 	unsigned int s3 = S3[(s3Col + s3Row)];
@@ -289,7 +241,6 @@ CIPHER_LR feistelFunction(CIPHER_LR right, KEY subkey){
 		(CIPHER_LR)((CIPHER_LR)s3 << 20) | (CIPHER_LR)(s4 << 16) | (CIPHER_LR)((CIPHER_LR)s5 << 12) | 
 		(CIPHER_LR)((CIPHER_LR)s6 << 8) | (CIPHER_LR) ((CIPHER_LR)s7 << 4) | (CIPHER_LR) (s8);
 	
-	printBits(sizeof(sBoxesRecombined), &sBoxesRecombined);
 	CIPHER_LR returnVal = 0;
 	KEY_LR value = 1;
 	for(i = 0; i<32; i++){
