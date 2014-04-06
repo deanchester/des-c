@@ -31,11 +31,13 @@ int main (int argc, char const *argv[])
 	};
 	
 	for(i =0; i<16; i++){
-		if(keys[i] == keysCheck[i]){
-			printf("Key at %d is the correct.\n", i);
-		} else {
-			printf("Key at %d is the incorrect.\n", i);
-		}
+		// printf("%llx\n", keys[i]);
+		printBits(sizeof(KEY), &keys[i]);
+		// if(keys[i] == keysCheck[i]){
+// 			printf("Key at %d is the correct.\n", i);
+// 		} else {
+// 			printf("Key at %d is the incorrect.\n", i);
+// 		}
 	}
 	
 	return 0;
